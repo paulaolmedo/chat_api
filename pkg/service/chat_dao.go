@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"log"
 
 	"github.com/challenge/pkg/models"
@@ -15,6 +16,7 @@ type ChatDAO struct {
 // ChatRepository funciones mínimas para utilizar la base de datos
 type ChatRepository interface {
 	AddUser(user *models.User) error
+	GetUser(user *models.User) (models.User, error)
 }
 
 // NewDAO given a path where to store the database, initializes the DAO with the API models
@@ -54,4 +56,23 @@ func (dao *ChatDAO) AddUser(user *models.User) error {
 	}
 
 	return nil
+}
+
+//GetUser verify if the pair username/password belongs to an user
+func (dao *ChatDAO) GetUser(user *models.User) (models.User, error) {
+	currentConnection := dao.db
+
+	query := "username = ? AND password = ?"
+	var args []interface{}
+	args = append(args, user.Username)
+	args = append(args, user.Password)
+
+	result := currentConnection.Where(query, args...).Find(&user)
+	if result.Error != nil {
+		return models.User{}, result.Error
+	} else if result.RowsAffected == 0 {
+		return models.User{}, errors.New("record not found")
+
+	}
+	return *user, nil
 }

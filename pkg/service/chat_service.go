@@ -13,6 +13,7 @@ type serviceProperties struct {
 
 type ChatService interface {
 	CreateUser(userInfo models.User) (*models.User, error)
+	GetUser(user models.User) (models.User, error)
 }
 
 // NewChatService initializes the service that communicates with the database
@@ -31,4 +32,17 @@ func (service *serviceProperties) CreateUser(userInfo models.User) (*models.User
 	}
 
 	return &userInfo, nil
+}
+
+func (service *serviceProperties) GetUser(user models.User) (models.User, error) {
+	hashUserPassword(&user)
+
+	userInfo, err := service.repository.GetUser(&user)
+	if err != nil && err.Error() == "record not found" {
+		return models.User{}, errors.New("user not found")
+	} else if err != nil {
+		return models.User{}, err
+	}
+
+	return userInfo, err
 }

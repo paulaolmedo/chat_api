@@ -71,3 +71,25 @@ func TestAddUserThatAlreadyExists(test *testing.T) {
 	assert.EqualError(test, errCreatingUser, expectedError)
 	assert.Empty(test, responseUser)
 }
+
+func TestGetUser(test *testing.T) {
+	user := InitUser("testUser", "12345678")
+	responseUser, errSearchingUser := chatService.GetUser(user)
+
+	require.NoError(test, errSearchingUser)
+
+	expectedPassword := "25d55ad283aa400af464c76d713c07ad"
+
+	assert.Equal(test, user.Username, responseUser.Username)
+	assert.Equal(test, expectedPassword, responseUser.Password)
+}
+
+func TestGetNonExistentUser(test *testing.T) {
+	user := InitUser("nonExistentUser", "12345678")
+	responseUser, errSearchingUser := chatService.GetUser(user)
+
+	expectedError := "user not found"
+
+	assert.EqualError(test, errSearchingUser, expectedError)
+	assert.Empty(test, responseUser)
+}

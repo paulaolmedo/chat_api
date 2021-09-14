@@ -9,7 +9,8 @@ type Health struct {
 }
 
 type Login struct {
-	// TODO: Implement Login model
+	Id    int64  `json:"id"`
+	Token string `json:"token"`
 }
 
 type User struct {
