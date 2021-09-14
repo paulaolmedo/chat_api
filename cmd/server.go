@@ -2,68 +2,46 @@ package main
 
 import (
 	"log"
-	"net/http"
+	"os"
 
-	"github.com/challenge/pkg/auth"
 	"github.com/challenge/pkg/controller"
+	"github.com/magiconair/properties"
 )
 
 const (
-	ServerPort = "8080"
-	CheckEndpoint = "/check"
-	UsersEndpoint = "/users"
-	LoginEndpoint = "/login"
+	ServerPort       = "8080"
+	CheckEndpoint    = "/check"
+	UsersEndpoint    = "/users"
+	LoginEndpoint    = "/login"
 	MessagesEndpoint = "/messages"
 )
 
 func main() {
-	h := controller.Handler{}
+	p := properties.MustLoadFile("cmd/chat.properties", properties.UTF8)
 
-	// Configure endpoints
-	// Health
-	http.HandleFunc(CheckEndpoint, func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
-			return
+	host := p.MustGetString("host")
+	databaseFolder := p.MustGetString("database_folder")
+	databaseHost := p.MustGetString("database_host")
+	environment := p.MustGetString("environment")
+
+	if _, err := os.Stat(databaseFolder); os.IsNotExist(err) {
+		err := os.Mkdir(databaseFolder, 0755)
+		if err != nil {
+			log.Fatalf("error creating database folder %v", err)
 		}
+	}
 
-		h.Check(w, r)
-	})
+	configuration := controller.Handler{}
 
-	// Users
-	http.HandleFunc(UsersEndpoint, func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
-			return
-		}
+	switch environment {
+	case "dev":
+		configuration.SetEnvironment(false)
+	case "production":
+		configuration.SetEnvironment(true)
+	default:
+		log.Fatalf("error reading environment value")
+	}
 
-		h.CreateUser(w, r)
-	})
-
-	// Auth
-	http.HandleFunc(LoginEndpoint, func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
-			return
-		}
-
-		h.Login(w, r)
-	})
-
-	// Messages
-	http.HandleFunc(MessagesEndpoint, auth.ValidateUser(func(w http.ResponseWriter, r *http.Request) {
-		switch r.Method {
-		case http.MethodGet:
-			h.GetMessages(w, r)
-		case http.MethodPost:
-			h.SendMessage(w, r)
-		default:
-			http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
-			return
-		}
-	}))
-
-	// Start server
-	log.Println("Server started at port " + ServerPort)
-	log.Fatal(http.ListenAndServe(":" + ServerPort, nil))
+	configuration.InitHTTPServer(databaseHost)
+	configuration.Run(host)
 }
