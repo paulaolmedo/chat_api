@@ -14,8 +14,10 @@ type ChatDAO struct {
 
 // ChatRepository funciones mínimas para utilizar la base de datos
 type ChatRepository interface {
+	AddUser(user *models.User) error
 }
 
+// NewDAO given a path where to store the database, initializes the DAO with the API models
 func NewDAO(databasePath string) (*ChatDAO, error) {
 	db, err := gorm.Open(sqlite.Open(databasePath), &gorm.Config{})
 	if err != nil {
@@ -40,4 +42,16 @@ func NewDAO(databasePath string) (*ChatDAO, error) {
 	dao := ChatDAO{db}
 
 	return &dao, nil
+}
+
+//AddUser adds a new user
+func (dao *ChatDAO) AddUser(user *models.User) error {
+	currentConnection := dao.db
+
+	result := currentConnection.Create(&user)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
 }
