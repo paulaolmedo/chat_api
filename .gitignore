@@ -1,0 +1,9 @@
+# database files
+*.db
+
+# auth properties
+auth0*
+
+# coverage files
+*.out
+*.html
