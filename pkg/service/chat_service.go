@@ -1,8 +1,6 @@
 package service
 
 import (
-	"crypto/md5"
-	"encoding/hex"
 	"errors"
 
 	"github.com/challenge/pkg/models"
@@ -33,11 +31,4 @@ func (service *serviceProperties) CreateUser(userInfo models.User) (*models.User
 	}
 
 	return &userInfo, nil
-}
-
-// hashUserPassword hashes the user password. For tests purposes it's only a MD5 hash, and without any salt
-func hashUserPassword(user *models.User) {
-	hash := md5.New()
-	hash.Write([]byte(user.Password))
-	user.Password = hex.EncodeToString(hash.Sum([]byte(nil)))
 }
