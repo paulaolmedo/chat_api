@@ -16,6 +16,7 @@ type ChatService interface {
 	CreateUser(userInfo models.User) (*models.User, error)
 	GetUser(user models.User) (models.User, error)
 	AddMessage(message *models.Message) (models.MessageResponse, error)
+	GetMessages(filter models.MessageFilter) ([]models.Message, error)
 }
 
 // NewChatService initializes the service that communicates with the database
@@ -59,4 +60,13 @@ func (service *serviceProperties) AddMessage(message *models.Message) (models.Me
 	}
 	response := models.MessageResponse{MessageID: message.MessageID, Timestamp: timestamp}
 	return response, nil
+}
+
+func (service *serviceProperties) GetMessages(filter models.MessageFilter) ([]models.Message, error) {
+	msgs, err := service.repository.GetMessages(filter)
+	if err != nil {
+		return nil, err
+	}
+
+	return msgs, err
 }

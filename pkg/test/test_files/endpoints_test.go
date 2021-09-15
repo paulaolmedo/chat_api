@@ -10,7 +10,7 @@ import (
 )
 
 func TestCreateUser(test *testing.T) {
-	user := InitUser("testUser", "12345678")
+	user := InitUser("testUser1", "12345678")
 
 	client := resty.New()
 	response, err := client.R().
@@ -23,7 +23,7 @@ func TestCreateUser(test *testing.T) {
 }
 
 func TestCreateUserThatAlreadyExists(test *testing.T) {
-	user := InitUser("testUser", "12345678")
+	user := InitUser("testUser1", "12345678")
 
 	client := resty.New()
 	response, err := client.R().
@@ -143,4 +143,44 @@ func TestCreateMessageWithNonExistentUsers(test *testing.T) {
 
 	require.NoError(test, err)
 	assert.Equal(test, http.StatusConflict, response.StatusCode())
+}
+
+func TestSearchMessage(test *testing.T) {
+	client := resty.New()
+	response, err := client.R().EnableTrace().
+		SetQueryParams(map[string]string{"recipient": "1", "start": "1", "limit": "1"}).
+		Get(testServer.URL + "/messages")
+
+	require.NoError(test, err)
+	assert.Equal(test, http.StatusOK, response.StatusCode())
+}
+
+func TestSearchMessageOfNonExistentRecipient(test *testing.T) {
+	client := resty.New()
+	response, err := client.R().EnableTrace().
+		SetQueryParams(map[string]string{"recipient": "123", "start": "1"}).
+		Get(testServer.URL + "/messages")
+
+	require.NoError(test, err)
+	assert.Equal(test, http.StatusConflict, response.StatusCode())
+}
+
+func TestSearchMessageWithInvalidRecipient(test *testing.T) {
+	client := resty.New()
+	response, err := client.R().EnableTrace().
+		SetQueryParams(map[string]string{"recipient": "-1", "start": "1"}).
+		Get(testServer.URL + "/messages")
+
+	require.NoError(test, err)
+	assert.Equal(test, http.StatusBadRequest, response.StatusCode())
+}
+
+func TestHealthCheck(test *testing.T) {
+	client := resty.New()
+	response, err := client.R().
+		EnableTrace().
+		Post(testServer.URL + "/check")
+
+	require.NoError(test, err)
+	assert.Equal(test, http.StatusOK, response.StatusCode())
 }

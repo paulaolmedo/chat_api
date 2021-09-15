@@ -58,8 +58,12 @@ func InitMessage(userID int64, recipient int64) models.Message {
 	return models.Message{UserID: userID, Recipient: recipient, MessageContent: content}
 }
 
+func InitMessageFilter(recipientID int64, messageID int64, limit int) models.MessageFilter {
+	return models.MessageFilter{Recipient: recipientID, Start: messageID, Limit: limit}
+}
+
 func TestAddUser(test *testing.T) {
-	user := InitUser("testUser", "12345678")
+	user := InitUser("testUser1", "12345678")
 	responseUser, errCreatingUser := chatService.CreateUser(user)
 
 	require.NoError(test, errCreatingUser)
@@ -71,7 +75,7 @@ func TestAddUser(test *testing.T) {
 }
 
 func TestAddUserThatAlreadyExists(test *testing.T) {
-	user := InitUser("testUser", "12345678")
+	user := InitUser("testUser1", "12345678")
 	responseUser, errCreatingUser := chatService.CreateUser(user)
 
 	expectedError := "user already exists"
@@ -80,7 +84,7 @@ func TestAddUserThatAlreadyExists(test *testing.T) {
 }
 
 func TestGetUser(test *testing.T) {
-	user := InitUser("testUser", "12345678")
+	user := InitUser("testUser1", "12345678")
 	responseUser, errSearchingUser := chatService.GetUser(user)
 
 	require.NoError(test, errSearchingUser)
@@ -102,8 +106,8 @@ func TestGetNonExistentUser(test *testing.T) {
 }
 
 func TestAddMessage(test *testing.T) {
-	user1 := InitUser("testMessageUser1", "12345678")
-	user2 := InitUser("testMessageUser2", "12345678")
+	user1 := InitUser("testMessageUser2", "12345678")
+	user2 := InitUser("testMessageUser3", "12345678")
 	_, errCreatingUser1 := chatService.CreateUser(user1)
 	require.NoError(test, errCreatingUser1)
 
@@ -144,4 +148,21 @@ func TestAddMessageWithInvalidRecipient(test *testing.T) {
 
 	assert.EqualError(test, errSendingMessage, expectedError)
 	assert.Empty(test, msgResponse)
+}
+
+func TestGetMessage(test *testing.T) {
+	filter := InitMessageFilter(3, 1, 0)
+
+	messages, errSearchingMessages := chatService.GetMessages(filter)
+	require.NoError(test, errSearchingMessages)
+	assert.NotEmpty(test, messages)
+}
+
+func TestGetMessageOfNonExistentUser(test *testing.T) {
+	filter := InitMessageFilter(1, 1, 0)
+
+	messages, errSearchingMessages := chatService.GetMessages(filter)
+	expectedError := "record not found"
+	assert.EqualError(test, errSearchingMessages, expectedError)
+	assert.Empty(test, messages)
 }

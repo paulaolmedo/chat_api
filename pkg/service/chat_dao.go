@@ -15,9 +15,13 @@ type ChatDAO struct {
 
 // ChatRepository funciones mínimas para utilizar la base de datos
 type ChatRepository interface {
+	// Main functions
 	AddUser(user *models.User) error
 	GetUser(user *models.User) (models.User, error)
 	AddMessage(message *models.Message) error
+	GetMessages(filter models.MessageFilter) ([]models.Message, error)
+
+	// Support functions
 	checkUserExistence(userID int64) bool
 }
 
@@ -79,6 +83,7 @@ func (dao *ChatDAO) GetUser(user *models.User) (models.User, error) {
 	return *user, nil
 }
 
+//AddMessage adds a new message after making sure that the sender and the recipients are valid users
 func (dao *ChatDAO) AddMessage(message *models.Message) error {
 	checkSender := dao.checkUserExistence(message.UserID)
 	if !checkSender {
@@ -97,6 +102,34 @@ func (dao *ChatDAO) AddMessage(message *models.Message) error {
 	}
 
 	return nil
+}
+
+// GetMessages given a starting id and a recipient, retrieves a certain amount of messages (default: 100)
+func (dao *ChatDAO) GetMessages(filter models.MessageFilter) ([]models.Message, error) {
+	currentConnection := dao.db
+
+	var messages []models.Message
+
+	// order by los mas recientes?
+	// fijarse antes de buscar si existe el recipient?
+	query := "message_id >= ? AND recipient = ?"
+	var args []interface{}
+	args = append(args, filter.Start)
+	args = append(args, filter.Recipient)
+
+	limit := 100
+	if filter.Limit != 0 {
+		limit = filter.Limit
+	}
+
+	result := currentConnection.Limit(limit).Where(query, args...).Find(&messages)
+	if result.Error != nil {
+		return []models.Message{}, result.Error
+	} else if result.RowsAffected == 0 {
+		return []models.Message{}, errors.New("record not found")
+
+	}
+	return messages, nil
 }
 
 func (dao *ChatDAO) checkUserExistence(userID int64) bool {

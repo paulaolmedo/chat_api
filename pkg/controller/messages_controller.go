@@ -42,7 +42,28 @@ func (config *Handler) SendMessage(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetMessages get the messages from the logged user to a recipient
-func (h Handler) GetMessages(w http.ResponseWriter, r *http.Request) {
+func (config *Handler) GetMessages(w http.ResponseWriter, r *http.Request) {
 	// TODO: Retrieve list of Messages
-	helpers.RespondJSON(w, []*models.Message{{}})
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	var filter models.MessageFilter
+	var err error
+
+	queryParams := r.URL.Query()
+
+	errGettingParams := getQueryParams(queryParams, &filter)
+	if errGettingParams != nil {
+		helpers.JSONResponse(w, http.StatusBadRequest, errGettingParams.Error())
+		return
+	}
+
+	responseUser, err := config.Database.GetMessages(filter)
+	if err != nil && err.Error() == MissingRecord {
+		helpers.JSONResponse(w, http.StatusConflict, err.Error())
+		return
+	} else if err != nil {
+		helpers.JSONResponse(w, http.StatusInternalServerError, UnknownError)
+		return
+	}
+
+	helpers.JSONResponse(w, http.StatusOK, responseUser)
 }
