@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"time"
 
 	"github.com/challenge/pkg/models"
 )
@@ -14,6 +15,7 @@ type serviceProperties struct {
 type ChatService interface {
 	CreateUser(userInfo models.User) (*models.User, error)
 	GetUser(user models.User) (models.User, error)
+	AddMessage(message *models.Message) (models.MessageResponse, error)
 }
 
 // NewChatService initializes the service that communicates with the database
@@ -45,4 +47,16 @@ func (service *serviceProperties) GetUser(user models.User) (models.User, error)
 	}
 
 	return userInfo, err
+}
+
+func (service *serviceProperties) AddMessage(message *models.Message) (models.MessageResponse, error) {
+	timestamp := time.Now().UTC()
+	message.Timestamp = timestamp
+
+	err := service.repository.AddMessage(message)
+	if err != nil {
+		return models.MessageResponse{}, err
+	}
+	response := models.MessageResponse{MessageID: message.MessageID, Timestamp: timestamp}
+	return response, nil
 }

@@ -17,6 +17,8 @@ type ChatDAO struct {
 type ChatRepository interface {
 	AddUser(user *models.User) error
 	GetUser(user *models.User) (models.User, error)
+	AddMessage(message *models.Message) error
+	checkUserExistence(userID int64) bool
 }
 
 // NewDAO given a path where to store the database, initializes the DAO with the API models
@@ -75,4 +77,33 @@ func (dao *ChatDAO) GetUser(user *models.User) (models.User, error) {
 
 	}
 	return *user, nil
+}
+
+func (dao *ChatDAO) AddMessage(message *models.Message) error {
+	checkSender := dao.checkUserExistence(message.UserID)
+	if !checkSender {
+		return errors.New("sender does not exist")
+	}
+
+	checkRecipient := dao.checkUserExistence(message.Recipient)
+	if !checkRecipient {
+		return errors.New("recipient does not exist")
+	}
+
+	currentConnection := dao.db
+	result := currentConnection.Create(&message)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+func (dao *ChatDAO) checkUserExistence(userID int64) bool {
+	currentConnection := dao.db
+	var user models.User
+
+	result := currentConnection.First(&user, userID)
+
+	return result.Error == nil
 }

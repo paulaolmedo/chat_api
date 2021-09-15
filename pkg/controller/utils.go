@@ -16,3 +16,14 @@ func validateUserData(user models.User) error {
 	}
 	return nil
 }
+
+func validateMessageData(message models.Message) error {
+	if message.UserID == 0 {
+		return errors.New("sender cannot be empty")
+	}
+	if message.Recipient == 0 {
+		return errors.New("recipient cannot be empty")
+	}
+
+	return nil
+}

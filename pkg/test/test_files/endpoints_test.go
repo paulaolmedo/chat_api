@@ -95,3 +95,52 @@ func TestLoginWithCorruptedData(test *testing.T) {
 	require.NoError(test, err)
 	assert.Equal(test, http.StatusBadRequest, response.StatusCode())
 }
+
+func TestCreateMessage(test *testing.T) {
+	user := InitMessage(1, 1)
+
+	client := resty.New()
+	response, err := client.R().
+		SetBody(user).
+		EnableTrace().
+		Post(testServer.URL + "/messages")
+
+	require.NoError(test, err)
+	assert.Equal(test, http.StatusCreated, response.StatusCode())
+}
+
+func TestMessagesWithCorruptedData(test *testing.T) {
+	client := resty.New()
+	response, err := client.R().
+		SetBody(nil).
+		EnableTrace().
+		Post(testServer.URL + "/messages")
+
+	require.NoError(test, err)
+	assert.Equal(test, http.StatusBadRequest, response.StatusCode())
+}
+func TestCreateMessageWithInvalidData(test *testing.T) {
+	user := InitMessage(0, 1)
+
+	client := resty.New()
+	response, err := client.R().
+		SetBody(user).
+		EnableTrace().
+		Post(testServer.URL + "/messages")
+
+	require.NoError(test, err)
+	assert.Equal(test, http.StatusBadRequest, response.StatusCode())
+}
+
+func TestCreateMessageWithNonExistentUsers(test *testing.T) {
+	user := InitMessage(11, 1)
+
+	client := resty.New()
+	response, err := client.R().
+		SetBody(user).
+		EnableTrace().
+		Post(testServer.URL + "/messages")
+
+	require.NoError(test, err)
+	assert.Equal(test, http.StatusConflict, response.StatusCode())
+}
