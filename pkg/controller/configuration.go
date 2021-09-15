@@ -47,8 +47,8 @@ func (config *Handler) InitRouters() {
 	config.Router.HandleFunc("/check", SetMiddlewareWithoutAuthentication(config.Check)).Methods("POST")
 	config.Router.HandleFunc("/users", SetMiddlewareWithoutAuthentication(config.CreateUser)).Methods("POST")
 	config.Router.HandleFunc("/login", SetMiddlewareWithoutAuthentication(config.Login)).Methods("POST")
-	config.Router.HandleFunc("/messages", SetMiddlewareWithoutAuthentication(config.SendMessage)).Methods("POST")
-	config.Router.HandleFunc("/messages", SetMiddlewareWithoutAuthentication(config.GetMessages)).Methods("GET")
+	config.Router.HandleFunc("/messages", SetMiddlewareWithAuthentication(config.SendMessage)).Methods("POST")
+	config.Router.HandleFunc("/messages", SetMiddlewareWithAuthentication(config.GetMessages)).Methods("GET")
 }
 
 func (serverConfiguration *Handler) InitDatabase(databasepath string) {
