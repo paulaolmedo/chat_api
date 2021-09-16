@@ -4,15 +4,7 @@ import (
 	"time"
 )
 
-type Health struct {
-	Status string `json:"health"`
-}
-
-type Login struct {
-	Id    int64  `json:"id"`
-	Token string `json:"token"`
-}
-
+// Database Structures
 type User struct {
 	UserID   int64     `json:"-" gorm:"primary_key"`
 	Message  []Message `json:"-" gorm:"foreignkey:UserID"`
@@ -26,17 +18,6 @@ type Message struct {
 	Recipient      int64     `json:"recipient" gorm:"index:recipient"`
 	MessageContent Content   `json:"content" gorm:"foreignKey:MessageID"`
 	Timestamp      time.Time `json:"-"`
-}
-
-type MessageFilter struct {
-	Start     int64 `json:"start"`
-	Recipient int64 `json:"recipient"`
-	Limit     int   `json:"limit"`
-}
-
-type MessageResponse struct {
-	MessageID int64     `json:"id"`
-	Timestamp time.Time `json:"timestamp"`
 }
 
 type Content struct {
@@ -63,4 +44,25 @@ type Video struct {
 type Text struct {
 	TextID int    `json:"id,omitempty" gorm:"primary_key"`
 	Text   string `json:"text,omitempty"`
+}
+
+// Support structures
+type Health struct {
+	Status string `json:"health"`
+}
+
+type Login struct {
+	Id    int64  `json:"id"`
+	Token string `json:"token"`
+}
+
+type MessageFilter struct {
+	Start     int64 `json:"start"`
+	Recipient int64 `json:"recipient"`
+	Limit     int   `json:"limit"`
+}
+
+type MessageResponse struct {
+	MessageID int64     `json:"id"`
+	Timestamp time.Time `json:"timestamp"`
 }

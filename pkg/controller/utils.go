@@ -10,23 +10,35 @@ import (
 )
 
 const (
+	// Endpoints
+	CheckEndpoint    = "/check"
+	UsersEndpoint    = "/users"
+	LoginEndpoint    = "/login"
+	MessagesEndpoint = "/messages"
+
 	// Query Params
 	Recipient = "recipient"
 	Start     = "start"
 	Limit     = "limit"
 
 	// Error messages
-	MandatoryField = "%v is a mandatory field"
-	InvalidNumber  = "invalid %v number: %v"
-	MissingRecord  = "record not found"
-
-	UnknownError = "Error retrieving user information"
+	MandatoryField   = "%v is a mandatory field"
+	InvalidNumber    = "invalid %v number: %v"
+	MissingRecord    = "record not found"
+	MissingUser      = "user not found"
+	MissingSender    = "sender does not exist"
+	MissingRecipient = "recipient does not exist"
+	JSONError        = "Error reading JSON data"
+	UnknownError     = "Error retrieving user information"
+	TokenError       = "Error generating token: %v"
+	UserExists       = "user already exists"
+	CannotBeEmpty    = "%v cannot be empty"
 )
 
 //validateUserData validates that the given input data is not empty
 func validateUserData(user models.User) error {
 	if user.Username == "" {
-		return errors.New("username cannot be empty")
+		return fmt.Errorf(CannotBeEmpty, "user")
 	}
 	if user.Password == "" || len(user.Password) < 8 {
 		return errors.New("password should be at least 8 characters")
@@ -36,10 +48,10 @@ func validateUserData(user models.User) error {
 
 func validateMessageData(message models.Message) error {
 	if message.UserID == 0 {
-		return errors.New("sender cannot be empty")
+		return fmt.Errorf(CannotBeEmpty, "sender")
 	}
 	if message.Recipient == 0 {
-		return errors.New("recipient cannot be empty")
+		return fmt.Errorf(CannotBeEmpty, "recipient")
 	}
 
 	return nil

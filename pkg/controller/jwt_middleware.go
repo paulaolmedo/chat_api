@@ -57,7 +57,7 @@ func getPemCert(token *jwt.Token, issuer string) (string, error) {
 
 // Configura el middleware para solicitar la autenticación con JWT tokens
 func SetMiddlewareJWT() *jwtmiddleware.JWTMiddleware {
-	p := properties.MustLoadFile("app/app.properties", properties.UTF8)
+	p := properties.MustLoadFile("cmd/chat.properties", properties.UTF8)
 	issuer_input := p.MustGetString("issuer")
 	audience_input := p.MustGetString("audience")
 

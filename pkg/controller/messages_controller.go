@@ -11,12 +11,10 @@ import (
 
 // SendMessage send a message from one user to another
 func (config *Handler) SendMessage(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-
 	var message models.Message
 	err := json.NewDecoder(r.Body).Decode(&message)
 	if err != nil {
-		helpers.JSONResponse(w, http.StatusBadRequest, "Error reading JSON data")
+		helpers.JSONResponse(w, http.StatusBadRequest, JSONError)
 		return
 	}
 
@@ -30,11 +28,11 @@ func (config *Handler) SendMessage(w http.ResponseWriter, r *http.Request) {
 	message.Timestamp = timestamp.In(time.UTC)
 
 	responseUser, err := config.Database.AddMessage(&message)
-	if err != nil && (err.Error() == "sender does not exist" || err.Error() == "recipient does not exist") {
+	if err != nil && (err.Error() == MissingSender || err.Error() == MissingRecipient) {
 		helpers.JSONResponse(w, http.StatusConflict, err.Error())
 		return
 	} else if err != nil {
-		helpers.JSONResponse(w, http.StatusInternalServerError, "Error retrieving user information")
+		helpers.JSONResponse(w, http.StatusInternalServerError, UnknownError)
 		return
 	}
 
@@ -44,7 +42,6 @@ func (config *Handler) SendMessage(w http.ResponseWriter, r *http.Request) {
 // GetMessages get the messages from the logged user to a recipient
 func (config *Handler) GetMessages(w http.ResponseWriter, r *http.Request) {
 	// TODO: Retrieve list of Messages
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	var filter models.MessageFilter
 	var err error
 

@@ -14,37 +14,27 @@ import (
 func ValidateUser(_ http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// TODO: validate token
+		// INSTEAD OF THIS THE TOKEN VALIDATION WILL BE MADE INSIDE OF THE FILE JWT_MIDDLEWARE.GO,
+		//WHICH TAKES A BEARER TOKEN AND VERIFIES IT'S AUDIENCE AND ISSUER
 		http.Error(w, "Invalid token", http.StatusUnauthorized)
 	}
 }
 
-type OAuthData struct {
-	ClientID     string `json:"client_id"`
-	ClientSecret string `json:"client_secret"`
-	Audience     string `json:"audience"`
-	GrantType    string `json:"grant_type"`
-}
-
-type OAuthToken struct {
-	Token      string `json:"access_token"`
-	Expiration string `json:"expires_in"`
-	TokenType  string `json:"token_type"`
-}
-
 // loadAuthProperties loads the authentication data to generate a token. It should be validated whether the fields are left blank or not to avoid problems
 func loadAuthProperties() (OAuthData, string) {
-	p := properties.MustLoadFile("pkg/auth/auth0.properties", properties.UTF8)
+	p := properties.MustLoadFile(fileLocation, properties.UTF8)
 
-	URL := p.MustGetString("url")
-	clientID := p.MustGetString("client_id")
-	clientSecret := p.MustGetString("client_secret")
-	audience := p.MustGetString("audience")
-	grantType := p.MustGetString("grant_type")
+	URL := p.MustGetString(urlProperty)
+	clientID := p.MustGetString(clientIDProperty)
+	clientSecret := p.MustGetString(clientSecretProperty)
+	audience := p.MustGetString(audienceProperty)
+	grantType := p.MustGetString(grantTypeProperty)
 
 	// no es la mejor forma de devolver esto...
 	return OAuthData{ClientID: clientID, ClientSecret: clientSecret, Audience: audience, GrantType: grantType}, URL
 }
 
+// GetBearerToken generates a Bearer token given certain credentials
 func GetBearerToken() (OAuthToken, error) {
 	data, url := loadAuthProperties()
 

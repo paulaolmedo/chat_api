@@ -77,7 +77,7 @@ func (dao *ChatDAO) GetUser(user *models.User) (models.User, error) {
 	if result.Error != nil {
 		return models.User{}, result.Error
 	} else if result.RowsAffected == 0 {
-		return models.User{}, errors.New("record not found")
+		return models.User{}, errors.New(missingRecord)
 
 	}
 	return *user, nil
@@ -87,12 +87,12 @@ func (dao *ChatDAO) GetUser(user *models.User) (models.User, error) {
 func (dao *ChatDAO) AddMessage(message *models.Message) error {
 	checkSender := dao.checkUserExistence(message.UserID)
 	if !checkSender {
-		return errors.New("sender does not exist")
+		return errors.New(missingSender)
 	}
 
 	checkRecipient := dao.checkUserExistence(message.Recipient)
 	if !checkRecipient {
-		return errors.New("recipient does not exist")
+		return errors.New(missingRecipient)
 	}
 
 	currentConnection := dao.db
@@ -126,7 +126,7 @@ func (dao *ChatDAO) GetMessages(filter models.MessageFilter) ([]models.Message, 
 	if result.Error != nil {
 		return []models.Message{}, result.Error
 	} else if result.RowsAffected == 0 {
-		return []models.Message{}, errors.New("record not found")
+		return []models.Message{}, errors.New(missingRecord)
 
 	}
 	return messages, nil

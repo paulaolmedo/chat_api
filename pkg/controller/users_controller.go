@@ -10,12 +10,10 @@ import (
 
 // CreateUser creates a new user given an username and a password
 func (config *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-
 	var user models.User
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
-		helpers.JSONResponse(w, http.StatusBadRequest, "Error reading JSON data")
+		helpers.JSONResponse(w, http.StatusBadRequest, JSONError)
 		return
 	}
 
@@ -26,7 +24,7 @@ func (config *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	responseUser, err := config.Database.CreateUser(user)
-	if err != nil && err.Error() == "user already exists" {
+	if err != nil && err.Error() == UserExists {
 		helpers.JSONResponse(w, http.StatusConflict, err.Error())
 		return
 	} else if err != nil {

@@ -18,6 +18,7 @@ type Handler struct {
 	Database service.ChatService
 }
 
+// SetEnvironment perhaps it's not optimal, but sets the enviroment to determine whether the tokens will be necessary or not
 func (serverConfiguration *Handler) SetEnvironment(envValue bool) {
 	environment = envValue
 }
@@ -44,11 +45,11 @@ func (serverConfiguration *Handler) Run(host string) {
 }
 
 func (config *Handler) InitRouters() {
-	config.Router.HandleFunc("/check", SetMiddlewareWithoutAuthentication(config.Check)).Methods("POST")
-	config.Router.HandleFunc("/users", SetMiddlewareWithoutAuthentication(config.CreateUser)).Methods("POST")
-	config.Router.HandleFunc("/login", SetMiddlewareWithoutAuthentication(config.Login)).Methods("POST")
-	config.Router.HandleFunc("/messages", SetMiddlewareWithAuthentication(config.SendMessage)).Methods("POST")
-	config.Router.HandleFunc("/messages", SetMiddlewareWithAuthentication(config.GetMessages)).Methods("GET")
+	config.Router.HandleFunc(CheckEndpoint, SetMiddlewareWithoutAuthentication(config.Check)).Methods("POST")
+	config.Router.HandleFunc(UsersEndpoint, SetMiddlewareWithoutAuthentication(config.CreateUser)).Methods("POST")
+	config.Router.HandleFunc(LoginEndpoint, SetMiddlewareWithoutAuthentication(config.Login)).Methods("POST")
+	config.Router.HandleFunc(MessagesEndpoint, SetMiddlewareWithAuthentication(config.SendMessage)).Methods("POST")
+	config.Router.HandleFunc(MessagesEndpoint, SetMiddlewareWithAuthentication(config.GetMessages)).Methods("GET")
 }
 
 func (serverConfiguration *Handler) InitDatabase(databasepath string) {
@@ -60,6 +61,7 @@ func (serverConfiguration *Handler) InitDatabase(databasepath string) {
 	serverConfiguration.Database = service.NewChatService(dao)
 }
 
+// notice that there are 2 different middlewares, since there are endpoints that requires no authentication
 func SetMiddlewareWithoutAuthentication(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")

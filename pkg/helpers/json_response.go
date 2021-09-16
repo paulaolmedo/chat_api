@@ -15,6 +15,7 @@ func RespondJSON(w http.ResponseWriter, resp interface{}) {
 }
 
 func JSONResponse(w http.ResponseWriter, statusCode int, response interface{}) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(statusCode)
 
 	err := json.NewEncoder(w).Encode(response) //puede ser datos de verdad o un error

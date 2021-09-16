@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/challenge/pkg/auth"
@@ -11,12 +12,10 @@ import (
 
 // Login authenticates a user and returns a bearer token
 func (config *Handler) Login(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-
 	var user models.User
 
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-		helpers.JSONResponse(w, http.StatusBadRequest, "Error reading JSON data")
+		helpers.JSONResponse(w, http.StatusBadRequest, JSONError)
 		return
 	}
 
@@ -26,17 +25,18 @@ func (config *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	responseUser, err := config.Database.GetUser(user)
-	if err != nil && err.Error() == "user not found" {
+	if err != nil && err.Error() == MissingUser {
 		helpers.JSONResponse(w, http.StatusNotFound, err.Error())
 		return
-	} else if err != nil {
-		helpers.JSONResponse(w, http.StatusInternalServerError, "Error retrieving user information")
+	} else if err != nil { // de acá para abajo aún no hay tests
+		helpers.JSONResponse(w, http.StatusInternalServerError, UnknownError)
 		return
 	}
 
 	bearer, err := auth.GetBearerToken()
 	if err != nil {
-		helpers.JSONResponse(w, http.StatusInternalServerError, "Error generating token")
+		errMsg := fmt.Errorf(TokenError, err)
+		helpers.JSONResponse(w, http.StatusInternalServerError, errMsg)
 		return
 	}
 
