@@ -27,7 +27,7 @@ func (config *Handler) SendMessage(w http.ResponseWriter, r *http.Request) {
 	timestamp := message.Timestamp
 	message.Timestamp = timestamp.In(time.UTC)
 
-	responseUser, err := config.Database.AddMessage(&message)
+	messageResponse, err := config.Database.AddMessage(&message)
 	if err != nil && (err.Error() == MissingSender || err.Error() == MissingRecipient) {
 		helpers.JSONResponse(w, http.StatusConflict, err.Error())
 		return
@@ -36,7 +36,7 @@ func (config *Handler) SendMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	helpers.JSONResponse(w, http.StatusCreated, responseUser)
+	helpers.JSONResponse(w, http.StatusCreated, messageResponse)
 }
 
 // GetMessages get the messages from the logged user to a recipient
@@ -53,7 +53,7 @@ func (config *Handler) GetMessages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responseUser, err := config.Database.GetMessages(filter)
+	messages, err := config.Database.GetMessages(filter)
 	if err != nil && err.Error() == MissingRecord {
 		helpers.JSONResponse(w, http.StatusConflict, err.Error())
 		return
@@ -62,5 +62,5 @@ func (config *Handler) GetMessages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	helpers.JSONResponse(w, http.StatusOK, responseUser)
+	helpers.JSONResponse(w, http.StatusOK, messages)
 }
