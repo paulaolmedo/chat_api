@@ -32,5 +32,6 @@ func (config *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// TODO cambiar para que sea solo el id
 	helpers.JSONResponse(w, http.StatusCreated, responseUser)
 }
