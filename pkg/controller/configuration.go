@@ -46,9 +46,186 @@ func (serverConfiguration *Handler) Run(host string) {
 
 func (config *Handler) InitRouters() {
 	config.Router.HandleFunc(CheckEndpoint, SetMiddlewareWithoutAuthentication(config.Check)).Methods("POST")
+
+	// swagger:operation POST /users CreateUser
+	//
+	// Add a new user
+	//
+	// Create a user in the system.
+	//
+	// ---
+	// produces:
+	// - application/json
+	// parameters:
+	// - in: body
+	//   name: user
+	//   description: User Information
+	//   required: true
+	//   schema:
+	//     "$ref": "#/definitions/User"
+	// responses:
+	//   '201':
+	//     description: User Information
+	//     schema:
+	//       type: array
+	//       items:
+	//         "$ref": "#/definitions/UserResponsee"
+	//   '409':
+	//     description: User already exists
+	//     schema:
+	//       type: array
+	//       items:
+	//         "$ref": "#/definitions/ModelError"
+	//   '400':
+	//     description: Bad Request
+	//     schema:
+	//       type: array
+	//       items:
+	//         "$ref": "#/definitions/ModelError"
+	//   '500':
+	//     description: Internal Server Error
+	//     schema:
+	//       type: array
+	//       items:
+	//         "$ref": "#/definitions/ModelError"
 	config.Router.HandleFunc(UsersEndpoint, SetMiddlewareWithoutAuthentication(config.CreateUser)).Methods("POST")
+
+	// swagger:operation POST /login Login
+	//
+	// Login
+	//
+	// Log in as an existing user.
+	//
+	// ---
+	// produces:
+	// - application/json
+	// parameters:
+	// - in: body
+	//   name: user
+	//   description: User Information
+	//   required: true
+	//   schema:
+	//     "$ref": "#/definitions/User"
+	// responses:
+	//   '200':
+	//     description: Token Information
+	//     schema:
+	//       type: array
+	//       items:
+	//         "$ref": "#/definitions/Login"
+	//   '409':
+	//     description: User does not exist
+	//     schema:
+	//       type: array
+	//       items:
+	//         "$ref": "#/definitions/ModelError"
+	//   '400':
+	//     description: Bad Request
+	//     schema:
+	//       type: array
+	//       items:
+	//         "$ref": "#/definitions/ModelError"
+	//   '500':
+	//     description: Internal Server Error
+	//     schema:
+	//       type: array
+	//       items:
+	//         "$ref": "#/definitions/ModelError"
 	config.Router.HandleFunc(LoginEndpoint, SetMiddlewareWithoutAuthentication(config.Login)).Methods("POST")
+
+	// swagger:operation POST /messages SendMessage
+	//
+	// Send a new message
+	//
+	// Send a message from one user to another.
+	//
+	// ---
+	// produces:
+	// - application/json
+	// parameters:
+	// - in: body
+	//   name: user
+	//   description: Message Information
+	//   required: true
+	//   schema:
+	//     "$ref": "#/definitions/Message"
+	// responses:
+	//   '201':
+	//     description: Message Information
+	//     schema:
+	//       type: array
+	//       items:
+	//         "$ref": "#/definitions/MessageResponse"
+	//   '409':
+	//     description: Sender or recipient doesn't exist
+	//     schema:
+	//       type: array
+	//       items:
+	//         "$ref": "#/definitions/ModelError"
+	//   '400':
+	//     description: Bad Request
+	//     schema:
+	//       type: array
+	//       items:
+	//         "$ref": "#/definitions/ModelError"
+	//   '500':
+	//     description: Internal Server Error
+	//     schema:
+	//       type: array
+	//       items:
+	//         "$ref": "#/definitions/ModelError"
 	config.Router.HandleFunc(MessagesEndpoint, SetMiddlewareWithAuthentication(config.SendMessage)).Methods("POST")
+
+	// swagger:operation GET /messages GetMessages
+	//
+	// Get Messages
+	//
+	// Fetch all existing messages to a given recipient, within a range of message IDs.
+	//
+	// ---
+	// produces:
+	// - application/json
+	// parameters:
+	// - name: recipient
+	//   in: query
+	//   description: User ID of recipient.
+	//   required: true
+	//   type: string
+	// - name: start
+	//   in: query
+	//   description: Starting message ID. Messages will be returned in increasing order of message ID, starting from this value (or the next lowest value stored in the database).
+	//   required: true
+	//   type: string
+	// - name: limit
+	//   in: query
+	//   description: Limit the response to this many messages.
+	//   required: false
+	//   type: string
+	// responses:
+	//   '200':
+	//     description: Messages
+	//     schema:
+	//       type: array
+	//       items:
+	//         "$ref": "#/definitions/Message"
+	//   '404':
+	//     description: Records not found
+	//     schema:
+	//       type: array
+	//       items:
+	//         "$ref": "#/definitions/ModelError"
+	//   '400':
+	//     description: Bad Request
+	//     schema:
+	//       type: array
+	//       items:
+	//         "$ref": "#/definitions/ModelError"
+	//   '500':
+	//     description: Internal Server Error
+	//     schema:
+	//       type: array
+	//       items:
+	//         "$ref": "#/definitions/ModelError"
 	config.Router.HandleFunc(MessagesEndpoint, SetMiddlewareWithAuthentication(config.GetMessages)).Methods("GET")
 }
 
