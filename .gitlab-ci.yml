@@ -25,7 +25,7 @@ format_and_test:
     - go vet $(go list ./... | grep -v /vendor/)
     - go test -race $(go list ./... | grep -v /vendor/)
 
-openapi:
+pages:
   stage: deploy
   image: node:latest
   script:
