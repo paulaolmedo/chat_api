@@ -69,7 +69,7 @@ func (config *Handler) InitRouters() {
 	//     schema:
 	//       type: array
 	//       items:
-	//         "$ref": "#/definitions/UserResponsee"
+	//         "$ref": "#/definitions/UserResponse"
 	//   '409':
 	//     description: User already exists
 	//     schema:
