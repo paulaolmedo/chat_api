@@ -1,4 +1,3 @@
-
 variables:
   # Please edit to your GitLab project
   REPO_NAME: gitlab.com/paulaolmedo/chat_api
@@ -16,7 +15,7 @@ before_script:
 
 stages:
   - test
-  - docs
+  - deploy
 
 format_and_test:
   stage: test
@@ -26,8 +25,8 @@ format_and_test:
     - go vet $(go list ./... | grep -v /vendor/)
     - go test -race $(go list ./... | grep -v /vendor/)
 
-openapi:
-  stage: docs
+pages:
+  stage: deploy
   image: node:latest
   script:
   - npm install -g redoc-cli
