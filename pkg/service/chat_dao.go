@@ -7,6 +7,7 @@ import (
 	"github.com/challenge/pkg/models"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type ChatDAO struct {
@@ -95,6 +96,7 @@ func (dao *ChatDAO) AddMessage(message *models.Message) error {
 		return errors.New(missingRecipient)
 	}
 
+	// primero guardar al mensaje y luego su contenido?
 	currentConnection := dao.db
 	result := currentConnection.Create(&message)
 	if result.Error != nil {
@@ -122,7 +124,9 @@ func (dao *ChatDAO) GetMessages(filter models.MessageFilter) ([]models.Message, 
 		limit = filter.Limit
 	}
 
-	result := currentConnection.Limit(limit).Where(query, args...).Find(&messages)
+	// esto debería (en teoría) cargar todas las subtablas de contenido
+	// pero no lo hace?
+	result := currentConnection.Preload(clause.Associations).Limit(limit).Where(query, args...).Find(&messages)
 	if result.Error != nil {
 		return []models.Message{}, result.Error
 	} else if result.RowsAffected == 0 {
