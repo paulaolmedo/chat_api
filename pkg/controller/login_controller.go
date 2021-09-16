@@ -19,6 +19,7 @@ func (config *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// TODO acá no sé si debería tirar el mensaje de que la pwd tiene que tener al menos 8 caracteres
 	if err := validateUserData(user); err != nil {
 		helpers.JSONResponse(w, http.StatusBadRequest, err.Error())
 		return
@@ -28,7 +29,7 @@ func (config *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	if err != nil && err.Error() == MissingUser {
 		helpers.JSONResponse(w, http.StatusNotFound, err.Error())
 		return
-	} else if err != nil { // de acá para abajo aún no hay tests
+	} else if err != nil { // TODO de acá para abajo aún no hay tests
 		helpers.JSONResponse(w, http.StatusInternalServerError, UnknownError)
 		return
 	}
