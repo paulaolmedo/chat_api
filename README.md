@@ -1,5 +1,7 @@
 # Chat API
 
+[![pipeline status](https://gitlab.com/paulaolmedo/chat_api/badges/main/pipeline.svg)](https://gitlab.com/paulaolmedo/chat_api/-/commits/main) 
+
 Basic API to simulate a chat. 
 A static version of the  documentation can be seen [here](https://paulaolmedo.gitlab.io/chat_api/openapi.html). Otherwise, the swagger file can be found [here](https://github.com/paulaolmedo/chat_api/tree/main/docs) along with an entity diagram of the database.
 
