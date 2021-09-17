@@ -7,8 +7,12 @@ A static version of the  documentation can be seen [here](https://paulaolmedo.gi
 ### 💻 Prerequisites
 Installed Go version >= 16 or Docker
 
+### ❗ 
+Inside the code are notes of functionality, and TODO's of things to improve
+
 ### Build/Run instructions
 #### Without docker
+When running without docker, beware of having the Auth0 properties under **pkg/auth**, since it provides the necessary authentication. OR the properties file under **cmd** can be changed to be a **dev** environment, that allows to run the endpoints w/o token in the header.
 ```
   go run pkg/server.go
 ```
