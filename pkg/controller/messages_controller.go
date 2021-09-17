@@ -12,6 +12,8 @@ import (
 // SendMessage send a message from one user to another
 func (config *Handler) SendMessage(w http.ResponseWriter, r *http.Request) {
 	var message models.Message
+	// TODO acá falta agregar quizás una struct adicional para que se adapte al json del swagger original
+	// además, una validación que noté a último momento es que se corresponda el tipo de contenido que se está mandando, con los parámetros ingresados
 	err := json.NewDecoder(r.Body).Decode(&message)
 	if err != nil {
 		helpers.JSONResponse(w, http.StatusBadRequest, JSONError)
@@ -62,5 +64,6 @@ func (config *Handler) GetMessages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// TODO y acá falta, al igual que en SendMessages, agregarle también una struct adicional para que se muestre como en el swagger original
 	helpers.JSONResponse(w, http.StatusOK, messages)
 }

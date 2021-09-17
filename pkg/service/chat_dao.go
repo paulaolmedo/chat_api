@@ -125,14 +125,15 @@ func (dao *ChatDAO) GetMessages(filter models.MessageFilter) ([]models.Message, 
 	}
 
 	// esto debería (en teoría) cargar todas las subtablas de contenido
-	// pero no lo hace?
+	// pero lo hace a medias?? solamente trae el tipo de contenido??
+	// pero igual si hago Contents.Texts o Content.Text (-para tomar de referencia-) tampoco anda?
 	result := currentConnection.Preload(clause.Associations).Limit(limit).Where(query, args...).Find(&messages)
 	if result.Error != nil {
 		return []models.Message{}, result.Error
 	} else if result.RowsAffected == 0 {
 		return []models.Message{}, errors.New(missingRecord)
-
 	}
+
 	return messages, nil
 }
 

@@ -10,7 +10,6 @@ require (
 	github.com/magiconair/properties v1.8.5
 	github.com/rs/cors v1.8.0
 	github.com/stretchr/testify v1.7.0
-	gopkg.in/resty.v1 v1.12.0
 	gorm.io/driver/sqlite v1.1.5
 	gorm.io/gorm v1.21.15
 )

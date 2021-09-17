@@ -45,7 +45,7 @@ type Message struct {
 	// example: 2
 	Recipient int64 `json:"recipient" gorm:"index:recipient"`
 	// Message content (one of three possible types)
-	MessageContent Content `json:"content" gorm:"foreignKey:MessageID"`
+	MessageContent Content `json:"content" gorm:"foreignKey:ContentID"`
 	// messages timestamp in UTC to avoid time-zones problems
 	Timestamp time.Time `json:"timestamp"`
 }
