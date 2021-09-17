@@ -176,17 +176,16 @@ definitions:
         x-go-name: Username
     type: object
     x-go-package: github.com/challenge/pkg/models
-  UserResponsee:
+  UserResponse:
     description: User represents identification of the created user
     properties:
-      id:
+      UserID:
         description: |-
           User ID of the newly created user.
           gorm.Model
         example: 1
         format: int64
         type: integer
-        x-go-name: UserID
     type: object
     x-go-package: github.com/challenge/pkg/models
   Video:
@@ -355,7 +354,7 @@ paths:
           description: User Information
           schema:
             items:
-              $ref: '#/definitions/UserResponsee'
+              $ref: '#/definitions/UserResponse'
             type: array
         "400":
           description: Bad Request
